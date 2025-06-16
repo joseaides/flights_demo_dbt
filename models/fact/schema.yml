@@ -2,19 +2,19 @@
 version: 2
 
 models:
-  - name: my_first_dbt_model
-    description: "A starter dbt model"
+  - name: fact_boarding_passes
+    description: "aircraft dimension model"
     columns:
-      - name: id
+      - name: aircraft_code
         description: "The primary key for this table"
         data_tests:
-          - unique
           - not_null
 
-  - name: my_second_dbt_model
-    description: "A starter dbt model"
+
+  - name: fact_flights
+    description: "airport dimension model"
     columns:
-      - name: id
+      - name: airport_code
         description: "The primary key for this table"
         data_tests:
           - unique

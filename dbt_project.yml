@@ -23,6 +23,15 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 
+on-run-start: 
+  - Create schema if not exists {{target.schema}}
+  - CREATE TABLE if not exists dwh.log_table (id varchar(50), start_at timestamp, end_at timestamp, run_time float, model_name varchar(50))
+  - insert into dwh.log_table (id, start_at, model_name) values('{{ invocation_id}}',clock_timestamp(),'General')
+  
+
+on-run-end:
+  - update dwh.log_table set end_at = clock_timestamp() , run_time = round(EXTRACT(EPOCH FROM (clock_timestamp() - start_at)) ,2)  where id = '{{ invocation_id}}' and model_name = 'General' 
+
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 vars:
@@ -33,12 +42,9 @@ vars:
 models:
   flights_demo_dbt:
     # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
-      +enabled: false
     dim:
       +materialized: incremental
-      #+pre_hook: "{{ delete_from(this) }}"
+      +pre_hook: "{{ delete_from(this) }}"
       +schema: dim
     fact:  
       +materialized: incremental
