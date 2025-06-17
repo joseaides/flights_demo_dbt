@@ -8,6 +8,7 @@ models:
       - name: aircraft_code
         description: "The primary key for this table"
         data_tests:
+          - unique
           - not_null
 
 
@@ -19,3 +20,12 @@ models:
         data_tests:
           - unique
           - not_null
+
+  - name: dim_date
+    description: "dates dimension model"
+    columns:
+      - name: date_dim_id
+        description: "The primary key for this table"
+        data_tests:
+          - unique
+          - not_null        

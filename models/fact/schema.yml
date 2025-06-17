@@ -3,19 +3,30 @@ version: 2
 
 models:
   - name: fact_boarding_passes
-    description: "aircraft dimension model"
+    description: "boarding passes fact model"
     columns:
-      - name: aircraft_code
-        description: "The primary key for this table"
-        data_tests:
-          - not_null
-
-
-  - name: fact_flights
-    description: "airport dimension model"
-    columns:
-      - name: airport_code
+      - name: ticket_no||'-'||flight_id
         description: "The primary key for this table"
         data_tests:
           - unique
           - not_null
+
+
+  - name: fact_tickets
+    description: "tickets fact model"
+    columns:
+      - name: book_ref
+        description: "The primary key for this table"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: fact_flights
+    description: "flights fact model"
+    columns:
+      - name: flight_id
+        description: "The primary key for this table"
+        data_tests:
+          - unique
+          - not_null
+
