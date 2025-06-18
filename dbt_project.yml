@@ -26,11 +26,11 @@ clean-targets:         # directories to be removed by `dbt clean`
 on-run-start: 
   - Create schema if not exists {{target.schema}}
   - CREATE TABLE if not exists dwh.log_table (id varchar(50), start_at timestamp, end_at timestamp, run_time float, model_name varchar(50))
-  - insert into dwh.log_table (id, start_at, model_name) values('{{ invocation_id}}',clock_timestamp(),'General')
+  - "{{ run_log('insert', 'General') }}"
   
 
 on-run-end:
-  - update dwh.log_table set end_at = clock_timestamp() , run_time = round(EXTRACT(EPOCH FROM (clock_timestamp() - start_at)) ,2)  where id = '{{ invocation_id}}' and model_name = 'General' 
+  - "{{ run_log('update', 'General') }}"
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
@@ -44,8 +44,11 @@ models:
     # Config indicated by + and applies to all files under models/example/
     dim:
       +materialized: incremental
-      +pre_hook: "{{ delete_from(this) }}"
+      +pre_hook: ["{{ delete_from(this) }}",  "{{ run_log('insert', this.name) }}"]
       +schema: dim
+      +post_hook:  "{{ run_log('update', this.name) }}"
     fact:  
       +materialized: incremental
       +schema: fact 
+      +pre_hook:   "{{ run_log('insert', this.name) }}"
+      +post_hook:  "{{ run_log('update', this.name) }}"
